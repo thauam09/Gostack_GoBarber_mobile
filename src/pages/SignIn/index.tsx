@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
   Platform,
   View,
   ScrollView,
+  Text,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -25,6 +29,12 @@ import logoImg from '../../assets/logo.png';
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
+  const formRef = useRef<FormHandles>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+
+  const handleSignIn = useCallback((data: object) => {
+    console.log(data);
+  }, []);
 
   return (
     <>
@@ -44,14 +54,52 @@ const SignIn: React.FC = () => {
               <Title>Faça seu logon</Title>
             </View>
 
-            <Input name="email" icon="mail" placeholder="E-mail" />
-            <Input name="password" icon="lock" placeholder="Senha" />
+            <Form
+              ref={formRef}
+              onSubmit={handleSignIn}
+              style={{ width: '100%' }}
+            >
+              <Input
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                name="email"
+                icon="mail"
+                placeholder="E-mail"
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  passwordInputRef.current?.focus();
+                }}
+              />
 
-            <Button onPress={() => {}}>Entrar</Button>
+              <Input
+                ref={passwordInputRef}
+                name="password"
+                icon="lock"
+                placeholder="Senha"
+                secureTextEntry
+                returnKeyType="send"
+                onSubmitEditing={() => {
+                  formRef.current?.submitForm();
+                }}
+              />
+
+              <Button
+                onPress={() => {
+                  formRef.current?.submitForm();
+                }}
+              >
+                Entrar
+              </Button>
+            </Form>
 
             <ForgotPassword onPress={() => {}}>
               <ForgotPasswordText>Esqueci minha senha</ForgotPasswordText>
             </ForgotPassword>
+
+            <Text style={{ marginTop: 20, fontSize: 10 }}>
+              Criado por: Thauã Martins
+            </Text>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
